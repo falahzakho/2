@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ku">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TECH RELL</title>
+    <style>
+        /* TikTok Inspired Tech Theme - Ultra Modern */
+        :root {
+            --bg-main: #09090b;
+            --bg-card: #121214;
+            --accent-pink: #fe2c55;
+            --accent-cyan: #25f4ee;
+            --text-white: #ffffff;
+            --text-gray: #a1a1aa;
+            --border-color: #27272a;
+            --input-focus: #3f3f46;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-white);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Effect for the Container */
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--bg-card);
+            border-radius: 28px;
+            padding: 40px 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--border-color);
+            position: relative;
+            min-height: 580px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Screen Animations */
+        .screen {
+            display: none;
+            animation: smoothFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes smoothFade {
+            from { opacity: 0; transform: scale(0.96) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Splash Screen Perfect Centering */
+        #splash-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-card);
+            border-radius: 28px;
+            z-index: 10;
+        }
+        #splash-screen.active {
+            display: flex;
+        }
+
+        /* NEW CYBER TECH LOGO STYLING */
+        .logo-box {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 25px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(-2px -2px 4px rgba(37, 244, 238, 0.6)) drop-shadow(2px 2px 4px rgba(254, 44, 85, 0.6));
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(-2px -2px 4px rgba(37, 244, 238, 0.5)) drop-shadow(2px 2px 4px rgba(254, 44, 85, 0.5)); }
+            50% { transform: scale(1.03); filter: drop-shadow(-4px -4px 8px rgba(37, 244, 238, 0.8)) drop-shadow(4px 4px 8px rgba(254, 44, 85, 0.8)); }
+        }
+
+        .brand-name {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, var(--accent-cyan), var(--text-white), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        /* Headings & Subtitles */
+        h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-gray);
+            text-align: center;
+            margin-bottom: 35px;
+            line-height: 1.5;
+        }
+
+        /* Premium Form Controls */
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 15px 18px;
+            background-color: #18181b;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            color: var(--text-white);
+            font-size: 15px;
+            transition: all 0.25s ease;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--text-white);
+            background-color: #202023;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Buttons Style */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--text-white);
+            border: none;
+            border-radius: 14px;
+            color: var(--bg-main);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            background-color: #e4e4e7;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-white);
+            margin-top: 14px;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.04);
+            border-color: var(--text-gray);
+        }
+
+        .forget-link {
+            display: block;
+            text-align: center;
+            margin-top: 22px;
+            font-size: 13px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .forget-link:hover {
+            color: var(--text-white);
+        }
+
+        /* Beautiful Option Cards for Code Reset */
+        .option-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .option-card {
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            background: #141416;
+        }
+
+        .option-card:hover {
+            border-color: var(--input-focus);
+            background: #18181b;
+        }
+
+        .option-card.selected {
+            border-color: var(--text-white);
+            background: #1e1e21;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+        }
+
+        .option-card svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--text-gray);
+            stroke-width: 2;
+            fill: none;
+            margin-bottom: 10px;
+            transition: stroke 0.2s;
+        }
+
+        .option-card.selected svg {
+            stroke: var(--text-white);
+        }
+
+        .option-card span {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-gray);
+        }
+
+        .option-card.selected span {
+            color: var(--text-white);
+        }
+
+        /* Hidden Verification Code Input styling */
+        .hidden-section {
+            display: none;
+            margin-top: 25px;
+            padding-top: 22px;
+            border-top: 1px dashed var(--border-color);
+            animation: smoothFade 0.4s ease;
+        }
+
+        /* Success screen badge */
+        .success-box {
+            text-align: center;
+            padding: 10px 0;
+        }
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            stroke: #22c55e;
+            stroke-width: 2.5;
+            fill: none;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- 1. SPLASH SCREEN (PERFECTLY CENTERED WITH NEW LOGO) -->
+        <div id="splash-screen" class="screen active">
+            <div class="logo-box">
+                <!-- New High Tech Custom Logo -->
+                <svg class="logo-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Outer Hexagon -->
+                    <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.3" />
+                    <!-- Cyber Tech Lines Inside -->
+                    <polygon points="50,15 82,33 82,67 50,85 18,67 18,33" stroke="url(#cyberGradient)" stroke-width="4" fill="none" stroke-dasharray="200" stroke-dashoffset="0" />
+                    <!-- Core Element (Play/Tech Node) -->
+                    <polygon points="42,35 68,50 42,65" fill="#ffffff" />
+                    <circle cx="50" cy="50" r="38" stroke="#25f4ee" stroke-width="1.5" fill="none" stroke-dasharray="5 10" />
+                    <!-- Gradients Definition -->
+                    <defs>
+                        <linearGradient id="cyberGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#25f4ee" />
+                            <stop offset="50%" stop-color="#ffffff" />
+                            <stop offset="100%" stop-color="#fe2c55" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <h1 class="brand-name">TECH RELL</h1>
+        </div>
+
+        <!-- 2. WELCOME SCREEN (SIGN IN / SIGN UP OPTIONS) -->
+        <div id="welcome-screen" class="screen">
+            <div style="text-align: center; margin-bottom: 45px;">
+                <div class="logo-box" style="width:75px; height:75px; margin-bottom:15px;">
+                    <svg class="logo-svg" viewBox="0 0 100 100">
+                        <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.3" />
+                        <polygon points="50,15 82,33 82,67 50,85 18,67 18,33" stroke="url(#cyberGradientWelcome)" stroke-width="4" fill="none" />
+                        <polygon points="42,35 68,50 42,65" fill="#ffffff" />
+                        <circle cx="50" cy="50" r="38" stroke="#25f4ee" stroke-width="1.5" fill="none" stroke-dasharray="5 10" />
+                        <defs>
+                            <linearGradient id="cyberGradientWelcome" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#25f4ee" />
+                                <stop offset="50%" stop-color="#ffffff" />
+                                <stop offset="100%" stop-color="#fe2c55" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h2>TECH RELL</h2>
+                <p class="subtitle">تۆڕا ڤیدیۆیی یا تەکنەلۆژییا نوی</p>
+            </div>
+            <button class="btn" onclick="navigateTo('signin-screen')">SIGN IN</button>
+            <button class="btn btn-secondary" onclick="navigateTo('signup-screen')">SIGN UP</button>
+        </div>
+
+        <!-- 3. SIGN IN SCREEN -->
+        <div id="signin-screen" class="screen">
+            <h2>SIGN IN</h2>
+            <p class="subtitle">بچۆ د ناڤ حسابا خۆ دا</p>
+            
+            <form onsubmit="handleSignIn(event)">
+                <div class="form-group">
+                    <label>EMAIL</label>
+                    <input type="email" placeholder="name@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>PASSWORD</label>
+                    <input type="password" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn">SIGN IN</button>
+            </form>
+
+            <a href="#" class="forget-link" onclick="navigateTo('forget-screen')">FORGET PASSWORD?</a>
+            <button class="btn btn-secondary" style="padding:12px; font-size:14px;" onclick="navigateTo('welcome-screen')">← زڤڕین</button>
+        </div>
+
+        <!-- 4. FORGET PASSWORD SCREEN -->
+        <div id="forget-screen" class="screen">
+            <h2>FORGET PASSWORD</h2>
+            <p class="subtitle">یوزەرنەیمێ بنڤیسە بۆ وەرگرتنا کۆدی</p>
+
+            <div class="form-group">
+                <label>USERNAME</label>
+                <input type="text" id="forget-username" placeholder="ناڤێ بەکارهێنەری" required>
+            </div>
+
+            <label style="display:block; font-size:12px; color:var(--text-gray); margin-bottom:12px; font-weight:600;">کۆد بۆ کیرێ بهێتە فرێکرن؟</label>
+            <div class="option-selector">
+                <div class="option-card" id="opt-sms" onclick="selectOption('sms')">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                    <span>Mobile (SMS)</span>
+                </div>
+                <div class="option-card" id="opt-email" onclick="selectOption('email')">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    <span>Email</span>
+                </div>
+            </div>
+
+            <button type="button" class="btn" onclick="sendCode()">SEND CODE</button>
+
+            <!-- Hidden Verification Form -->
+            <div class="hidden-section" id="forget-code-section">
+                <div class="form-group">
+                    <label style="color: var(--accent-pink); text-align:center;">ENTER VERIFICATION CODE</label>
+                    <input type="text" placeholder="••••••" maxlength="6" style="text-align:center; font-size:22px; letter-spacing:6px; background:#202023;">
+                </div>
+                <button type="button" class="btn" style="background-color:var(--accent-pink); color:white;" onclick="simulateSuccess('کۆد درستە! نوکە تو دشێی پاسوۆردێ نوو دانی.')">پشتڕاستکرن</button>
+            </div>
+
+            <button class="btn btn-secondary" style="padding:12px; font-size:14px; margin-top:20px;" onclick="navigateTo('signin-screen')">← زڤڕین</button>
+        </div>
+
+        <!-- 5. SIGN UP SCREEN -->
+        <div id="signup-screen" class="screen">
+            <h2>SIGN UP</h2>
+            <p class="subtitle">تۆمارکرنا حسابەکا نوو د وێب سایتی دا</p>
+
+            <form onsubmit="handleSignUp(event)">
+                <div class="form-group">
+                    <label>USERNAME</label>
+                    <input type="text" placeholder="user123" required>
+                </div>
+                <div class="form-group">
+                    <label>NAME</label>
+                    <input type="text" placeholder="ناڤێ سیانی بنڤیسە" required>
+                </div>
+                <div class="form-group">
+                    <label>EMAIL</label>
+                    <input type="email" placeholder="name@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>PASSWORD</label>
+                    <input type="password" placeholder="••••••••" required>
+                </div>
+                <div class="form-group">
+                    <label>CONFIRM PASSWORD</label>
+                    <input type="password" placeholder="••••••••" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>COUNTRY</label>
+                        <select required>
+                            <option value="">هەڵبژێرە</option>
+                            <option value="Iraq">Iraq</option>
+                            <option value="USA">USA</option>
+                            <option value="UK">UK</option>
+                            <option value="Germany">Germany</option>
+                            <option value="Sweden">Sweden</option>
+                            <option value="Turkey">Turkey</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>GENDER</label>
+                        <select required>
+                            <option value="">هەڵبژێرە</option>
+                            <option value="Male">نێر (Male)</option>
+                            <option value="Female">مێ (Female)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" style="background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink)); color: white;">SUBMIT & SEND CODE</button>
+            </form>
+
+            <button class="btn btn-secondary" style="padding:12px; font-size:14px;" onclick="navigateTo('welcome-screen')">← زڤڕین</button>
+        </div>
+
+        <!-- 6. EMAIL VERIFICATION SCREEN -->
+        <div id="signup-verify-screen" class="screen">
+            <h2>EMAIL VERIFICATION</h2>
+            <p class="subtitle">کۆدەک بۆ ئیمەیلێ تە هاتیە فرێکرن. ل ڤێرە داخل بکە:</p>
+
+            <div class="form-group">
+                <label>ENTER CODE</label>
+                <input type="text" id="email-otp" placeholder="••••••" maxlength="6" style="text-align:center; font-size:24px; letter-spacing:6px; background:#18181b;" required>
+            </div>
+            <button class="btn" style="background-color: var(--accent-cyan); color: black;" onclick="simulateSuccess('پیرۆزە! ئەکاونتێ تە ب سەرکەفتن هاتە دروستکرن')">VERIFY & ENTER</button>
+            <button class="btn btn-secondary" style="padding:12px; font-size:14px;" onclick="navigateTo('signup-screen')">← گۆهرینا زانیاریان</button>
+        </div>
+
+        <!-- 7. SUCCESS SCREEN -->
+        <div id="success-screen" class="screen">
+            <div class="success-box">
+                <svg class="success-icon" viewBox="0 0 24 24">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                    <polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+                <h2 id="success-title">ب سەرکەفتوویی چوو د ناڤ دا!</h2>
+                <p class="subtitle" id="success-msg">تۆ د ناڤ پەرپەڕێ سەرەکی یێ TECH RELL دای.</p>
+                <button class="btn btn-secondary" style="border-color: var(--accent-pink); color: var(--accent-pink);" onclick="resetApp()">دەرکەفتن (Logout)</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let selectedResetMethod = '';
+
+        // Splash screen controls (2 seconds)
+        setTimeout(() => {
+            document.getElementById('splash-screen').style.display = 'none';
+            navigateTo('welcome-screen');
+        }, 2000);
+
+        function navigateTo(screenId) {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => {
+                if(screen.id !== 'splash-screen') screen.classList.remove('active');
+            });
+            
+            const target = document.getElementById(screenId);
+            if(target) {
+                target.classList.add('active');
+            }
+        }
+
+        function selectOption(method) {
+            selectedResetMethod = method;
+            document.getElementById('opt-sms').classList.remove('selected');
+            document.getElementById('opt-email').classList.remove('selected');
+            
+            if(method === 'sms') {
+                document.getElementById('opt-sms').classList.add('selected');
+            } else if(method === 'email') {
+                document.getElementById('opt-email').classList.add('selected');
+            }
+        }
+
+        function sendCode() {
+            const username = document.getElementById('forget-username').value;
+            if(!username) {
+                alert('تکایە سەرەتا Username بنڤیسە!');
+                return;
+            }
+            if(!selectedResetMethod) {
+                alert('تکایە شێوازەکێ وەرگرتنێ دەستنیشان بکە (SMS یان Email)!');
+                return;
+            }
+            document.getElementById('forget-code-section').style.display = 'block';
+        }
+
+        function handleSignIn(e) {
+            e.preventDefault();
+            document.getElementById('success-title').innerText = "ب سەرکەفتوویی چوویە ژوور!";
+            document.getElementById('success-msg').innerText = "تۆ د ناڤ پەرپەڕێ سەرەکی یێ TECH RELL دای.";
+            navigateTo('success-screen');
+        }
+
+        function handleSignUp(e) {
+            e.preventDefault();
+            navigateTo('signup-verify-screen');
+        }
+
+        function simulateSuccess(message) {
+            document.getElementById('success-title').innerText = "سەرکەفتن!";
+            document.getElementById('success-msg').innerText = message;
+            navigateTo('success-screen');
+        }
+
+        function resetApp() {
+            document.getElementById('forget-code-section').style.display = 'none';
+            document.getElementById('forget-username').value = '';
+            if(document.getElementById('email-otp')) document.getElementById('email-otp').value = '';
+            document.getElementById('opt-sms').classList.remove('selected');
+            document.getElementById('opt-email').classList.remove('selected');
+            selectedResetMethod = '';
+            navigateTo('welcome-screen');
+        }
+    </script>
+</body>
+</html>
+
