@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ku">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TECH RELL</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        /* TikTok Inspired Tech Theme - Ultra Modern */
+        :root {
+            --bg-main: #09090b;
+            --bg-card: #121214;
+            --accent-pink: #fe2c55;
+            --accent-cyan: #25f4ee;
+            --text-white: #ffffff;
+            --text-gray: #a1a1aa;
+            --border-color: #27272a;
+            --input-focus: #3f3f46;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-white);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            background-color: var(--bg-card);
+            border-radius: 28px;
+            padding: 40px 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--border-color);
+            position: relative;
+            min-height: 580px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .screen {
+            display: none;
+            animation: smoothFade 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes smoothFade {
+            from { opacity: 0; transform: scale(0.96) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        #splash-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-card);
+            border-radius: 28px;
+            z-index: 10;
+        }
+        #splash-screen.active {
+            display: flex;
+        }
+
+        .logo-box {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 25px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .logo-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(-2px -2px 4px rgba(37, 244, 238, 0.6)) drop-shadow(2px 2px 4px rgba(254, 44, 85, 0.6));
+            animation: pulseGlow 3s infinite ease-in-out;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(-2px -2px 4px rgba(37, 244, 238, 0.5)) drop-shadow(2px 2px 4px rgba(254, 44, 85, 0.5)); }
+            50% { transform: scale(1.03); filter: drop-shadow(-4px -4px 8px rgba(37, 244, 238, 0.8)) drop-shadow(4px 4px 8px rgba(254, 44, 85, 0.8)); }
+        }
+
+        .brand-name {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, var(--accent-cyan), var(--text-white), var(--accent-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-gray);
+            text-align: center;
+            margin-bottom: 35px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-gray);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            background-color: #18181b;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-white);
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--text-white);
+            background-color: #202023;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--text-white);
+            border: none;
+            border-radius: 12px;
+            color: var(--bg-main);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .btn:hover { background-color: #e4e4e7; }
+
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-white);
+            margin-top: 12px;
+        }
+
+        .forget-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--text-gray);
+            text-decoration: none;
+        }
+
+        /* Success/Loading UI states */
+        .loading-text {
+            text-align: center;
+            color: var(--accent-cyan);
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <div id="splash-screen" class="screen active">
+            <div class="logo-box">
+                <svg class="logo-svg" viewBox="0 0 100 100">
+                    <polygon points="50,5 90,28 90,72 50,95 10,72 10,28" stroke="#ffffff" stroke-width="3" fill="none" opacity="0.3" />
+                    <polygon points="50,15 82,33 82,67 50,85 18,67 18,33" stroke="url(#cyberGradient)" stroke-width="4" fill="none" />
+                    <polygon points="42,35 68,50 42,65" fill="#ffffff" />
+                    <defs>
+                        <linearGradient id="cyberGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#25f4ee" />
+                            <stop offset="100%" stop-color="#fe2c55" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <h1 class="brand-name">TECH RELL</h1>
+        </div>
+
+        <div id="welcome-screen" class="screen">
+            <div style="text-align: center; margin-bottom: 45px;">
+                <h2>TECH RELL</h2>
+                <p class="subtitle">تۆڕا ڤیدیۆیی یا تەکنەلۆژییا نوی</p>
+            </div>
+            <button class="btn" onclick="navigateTo('signin-screen')">SIGN IN</button>
+            <button class="btn btn-secondary" onclick="navigateTo('signup-screen')">SIGN UP</button>
+        </div>
+
+        <div id="signin-screen" class="screen">
+            <h2>SIGN IN</h2>
+            <p class="subtitle">بچۆ د ناڤ حسابا خۆ دا</p>
+            <form onsubmit="alert('تکایە بچۆ SIGN UP بۆ دروستکرنا ئەکاونتی و بەرهەڤکرنا داتایان'); event.preventDefault();">
+                <div class="form-group"><label>EMAIL</label><input type="email" required></div>
+                <div class="form-group"><label>PASSWORD</label><input type="password" required></div>
+                <button type="submit" class="btn">SIGN IN</button>
+            </form>
+            <button class="btn btn-secondary" onclick="navigateTo('welcome-screen')">← زڤڕین</button>
+        </div>
+
+        <div id="signup-screen" class="screen">
+            <h2>SIGN UP</h2>
+            <p class="subtitle">حسابەکا نوو تۆمار بکە</p>
+
+            <form id="signup-form" onsubmit="handleSignUp(event)">
+                <div class="form-group"><label>USERNAME</label><input type="text" id="reg-user" required></div>
+                <div class="form-group"><label>NAME</label><input type="text" id="reg-name" required></div>
+                <div class="form-group"><label>EMAIL</label><input type="email" id="reg-email" required></div>
+                <div class="form-group"><label>PASSWORD</label><input type="password" id="reg-pass" required></div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>COUNTRY</label>
+                        <select id="reg-country" required>
+                            <option value="Iraq">Iraq</option><option value="USA">USA</option><option value="Germany">Germany</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>GENDER</label>
+                        <select id="reg-gender" required>
+                            <option value="Male">Male</option><option value="Female">Female</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="loading-spn" class="loading-text">چاوڕێبە... کۆد دهێتە ڕەوانەکرن...</div>
+                <button type="submit" class="btn" style="background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink)); color: white;">SUBMIT & SEND CODE</button>
+            </form>
+            <button class="btn btn-secondary" onclick="navigateTo('welcome-screen')">← زڤڕین</button>
+        </div>
+
+        <div id="signup-verify-screen" class="screen">
+            <h2>EMAIL VERIFICATION</h2>
+            <p class="subtitle">کۆدەک بۆ ئیمەیلێ تە چوویە، ل ڤێرە داخل بکە:</p>
+            <div class="form-group">
+                <input type="text" id="email-otp" placeholder="••••••" maxlength="6" style="text-align:center; font-size:24px; letter-spacing:6px;" required>
+            </div>
+            <div id="verify-loading" class="loading-text">چاوڕێبە... داتایان خەزن دکەین...</div>
+            <button class="btn" style="background-color: var(--accent-cyan); color: black;" onclick="verifyAndSave()">VERIFY & SAVE</button>
+        </div>
+
+        <div id="success-screen" class="screen" style="text-align:center;">
+            <h2 style="color:#22c55e;">سەرکەفتن!</h2>
+            <p class="subtitle" style="margin-top:15px;">ئەکاونتێ تە ب سەرکەفتن هاتە دروستکرن و زانیاری د ناڤ داتابەیسی دا هاتنە پاراستن.</p>
+            <button class="btn btn-secondary" onclick="location.reload()">دەرکەفتن</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- کلیلێن فەرمی یێن تە ب تەمامی هاتنە جێگیرکرن ---
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxk00bkXHR9GUfcHIIM4ysbfW36cQocJxWoXQCShTkFigG0mv0JiHUDp5OGkAR4_ME/exec";
+        const EMAILJS_SERVICE_ID = "service_bjtqav5";
+        const EMAILJS_TEMPLATE_ID = "template_hmvj4gf";
+        const EMAILJS_PUBLIC_KEY = "xvujUenqXuSGbY2zO"; 
+
+        // دەستپێکرنا سیستەمێ EmailJS ب کلیلێ نوو
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+
+        let generatedOTP = '';
+        let tempUserData = {};
+
+        setTimeout(() => {
+            document.getElementById('splash-screen').style.display = 'none';
+            navigateTo('welcome-screen');
+        }, 2000);
+
+        function navigateTo(screenId) {
+            document.querySelectorAll('.screen').forEach(s => { if(s.id !== 'splash-screen') s.classList.remove('active'); });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // ١. ناردنی کۆد ب ڕێکا EmailJS
+        function handleSignUp(e) {
+            e.preventDefault();
+            document.getElementById('loading-spn').style.display = 'block';
+
+            generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+
+            tempUserData = {
+                username: document.getElementById('reg-user').value,
+                name: document.getElementById('reg-name').value,
+                email: document.getElementById('reg-email').value,
+                password: document.getElementById('reg-pass').value,
+                country: document.getElementById('reg-country').value,
+                gender: document.getElementById('reg-gender').value
+            };
+
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                to_name: tempUserData.name,
+                to_email: tempUserData.email,
+                otp_code: generatedOTP
+            }).then(() => {
+                document.getElementById('loading-spn').style.display = 'none';
+                navigateTo('signup-verify-screen');
+            }, (error) => {
+                document.getElementById('loading-spn').style.display = 'none';
+                alert("شەکەت د ناردنا ئیمەیلێ دا: " + JSON.stringify(error));
+            });
+        }
+
+        // ٢. پشتڕاستکرن و ناردن بۆ Google Sheets
+        function verifyAndSave() {
+            const enteredCode = document.getElementById('email-otp').value;
+            if(enteredCode !== generatedOTP) {
+                alert("کۆد خەڵەتە! تکایە دووبارە تاقی بکەوە.");
+                return;
+            }
+
+            document.getElementById('verify-loading').style.display = 'block';
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(tempUserData)
+            }).then(() => {
+                document.getElementById('verify-loading').style.display = 'none';
+                navigateTo('success-screen');
+            }).catch(err => {
+                document.getElementById('verify-loading').style.display = 'none';
+                alert("کێشەیەک د خەزنکرنێ دا هەیە");
+            });
+        }
+    </script>
+</body>
+</html>
