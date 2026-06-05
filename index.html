@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ku">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TECH RELL</title>
+    <style>
+        :root {
+            --bg-main: #06070d;
+            --bg-card: rgba(13, 16, 27, 0.85);
+            --accent-pink: #ff0055;
+            --accent-cyan: #00f0ff;
+            --text-white: #ffffff;
+            --text-gray: #64748b;
+            --border-color: rgba(255, 255, 255, 0.06);
+            --glow-cyan: rgba(0, 240, 255, 0.15);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        body { 
+            background-color: var(--bg-main);
+            color: var(--text-white); 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            overflow-x: hidden;
+        }
+        
+        .app-container { 
+            width: 100vw; 
+            height: 100vh; 
+            max-width: 100%;
+            background-color: var(--bg-card); 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center;
+        }
+
+        .screen { display: none; opacity: 0; transform: translateY(15px); transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); padding: 30px 20px; }
+        .screen.active { display: block; opacity: 1; transform: translateY(0); }
+        
+        #splash-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; background-color: var(--bg-main); z-index: 10; padding: 0; }
+        #splash-screen.active { display: flex; opacity: 1; }
+        
+        .logo-box { width: 95px; height: 95px; margin: 0 auto 20px auto; animation: floatAnim 3s ease-in-out infinite; }
+        @keyframes floatAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .logo-svg { width: 100%; height: 100%; filter: drop-shadow(0px 0px 15px rgba(0, 240, 255, 0.4)); }
+        
+        .brand-name { font-size: 36px; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; background: linear-gradient(45deg, var(--accent-cyan), #ffffff, var(--accent-pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: center; }
+        
+        .card-panel {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        h2 { font-size: 26px; font-weight: 800; margin-bottom: 6px; text-align: center; letter-spacing: 0.5px; }
+        .subtitle { font-size: 13px; color: var(--text-gray); text-align: center; margin-bottom: 25px; line-height: 1.5; }
+        
+        input, select, textarea { 
+            width: 100%; 
+            padding: 15px 18px; 
+            background-color: rgba(0, 0, 0, 0.4); 
+            border: 1px solid var(--border-color); 
+            border-radius: 12px; 
+            color: var(--text-white); 
+            font-size: 15px; 
+            outline: none; 
+            transition: all 0.25s ease;
+        }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent-cyan); box-shadow: 0 0 15px var(--glow-cyan); background-color: rgba(0,0,0,0.6); }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 11px; color: var(--text-gray); margin-bottom: 8px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        
+        .btn { 
+            width: 100%; 
+            padding: 16px; 
+            background: linear-gradient(90deg, #00e5ff, #00aeff); 
+            border: none; 
+            border-radius: 12px; 
+            color: #04060a; 
+            font-size: 15px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            margin-top: 10px; 
+            box-shadow: 0 5px 20px rgba(0, 229, 255, 0.25);
+            transition: all 0.25s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 7px 25px rgba(0, 229, 255, 0.4); }
+        .btn-secondary { background: transparent; border: 1px solid var(--border-color); color: #cbd5e1; margin-top: 12px; box-shadow: none; }
+        .forget-link { display: block; text-align: right; margin-top: -8px; margin-bottom: 20px; font-size: 12px; color: var(--accent-pink); cursor: pointer; font-weight: 600; }
+        
+        /* MAIN APP SCREEN */
+        #main-app-screen { position: absolute; top:0; left:0; width:100%; height:100%; padding:0; display:none; background-color:#000; overflow:hidden; }
+        #main-app-screen.active { display: flex; flex-direction: column; opacity: 1; transform: none; }
+        
+        /* TOP APP BAR */
+        .top-app-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            padding: 0 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            z-index: 9;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+            pointer-events: none;
+        }
+        .top-search-trigger {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            pointer-events: auto;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s;
+            color: #fff;
+        }
+        .top-search-trigger:active { transform: scale(0.9); background: rgba(0, 240, 255, 0.2); }
+        .top-search-trigger svg { width: 20px; height: 20px; fill: currentColor; }
+
+        .app-content-area { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; width: 100%; height: 100%; }
+        .tab-content { width: 100%; height: 100%; display: none; flex-direction: column; justify-content: center; align-items: center; }
+        .tab-content.active { display: flex; }
+
+        /* CAMERA INTERFACE */
+        .camera-container { width: 100%; height: 100%; position: relative; background: #000; display: flex; flex-direction: column; justify-content: space-between; }
+        #camera-stream { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 1; transition: filter 0.3s ease, transform 0.2s ease; }
+        #screen-flash-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; z-index: 9; }
+        .camera-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; padding: 20px; background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 25%, transparent 65%, rgba(0,0,0,0.8) 100%); }
+        .camera-top-actions { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; padding-top: 10px; position: relative; z-index: 10; }
+        .camera-top-right-group { display: flex; flex-direction: column; gap: 15px; align-items: flex-end; }
+        .add-music-center-container { position: absolute; left: 50%; top: 25px; transform: translateX(-50%); z-index: 10; }
+        .add-music-btn { background: rgba(20, 20, 20, 0.75); border: 1px solid rgba(255, 255, 255, 0.3); padding: 10px 18px; border-radius: 30px; color: #ffffff; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; cursor: pointer; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.4); white-space: nowrap; }
+        
+        .cam-icon-btn { background: rgba(0, 0, 0, 0.55); width: 45px; height: 45px; border-radius: 50%; color: white; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 20px; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.2s ease; position: relative; overflow: hidden; }
+        .cam-icon-btn:active { transform: scale(0.9); }
+        
+        .camera-bottom-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; padding-bottom: 20px; z-index: 3; }
+        .capture-trigger-btn { width: 74px; height: 74px; border-radius: 50%; background: white; border: 6px solid rgba(255, 255, 255, 0.35); cursor: pointer; z-index: 6; transition: all 0.2s ease; }
+        .capture-trigger-btn.video-mode { background: var(--accent-pink); border-color: rgba(255, 0, 85, 0.35); }
+        .capture-trigger-btn:active { transform: scale(0.9); }
+        .camera-modes { display: flex; gap: 25px; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.5); margin-top: 5px; }
+        .camera-mode-item { cursor: pointer; transition: color 0.2s; }
+        .camera-mode-item.active { color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+
+        /* LIVE CAMERA STICKERS ZONE */
+        #live-sticker-zone { position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:4; }
+
+        /* PREVIEW SCREEN */
+        .preview-box { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: #000000; z-index:10; flex-direction:column; justify-content: space-between; padding: 0; overflow: hidden; }
+        .fullscreen-media-container { width: 100%; height: 100%; position: absolute; top:0; left:0; z-index: 1; display: flex; justify-content: center; align-items: center; }
+        .fullscreen-media-container img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .media-overlay-text-display { position: absolute; z-index: 5; color: #ffffff; font-size: 26px; font-weight: bold; text-align: center; padding: 6px 14px; border-radius: 8px; pointer-events: auto; cursor: move; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+        .preview-top-bar { position: relative; z-index: 6; padding: 20px; display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .preview-bottom-bar { position: relative; z-index: 6; padding: 30px 20px; display: flex; justify-content: space-between; align-items: center; width: 100%; background: linear-gradient(to top, rgba(0,0,0,0.7), transparent); }
+        .story-quick-btn { padding: 14px 28px; background: rgba(255, 255, 255, 0.2); color: #ffffff; border: none; border-radius: 30px; font-weight: 800; font-size: 15px; cursor: pointer; }
+        .next-step-btn { padding: 14px 35px; background: linear-gradient(90deg, var(--accent-cyan), #00aeff); color: #000000; border: none; border-radius: 30px; font-weight: 800; font-size: 15px; cursor: pointer; }
+
+        /* DETAILS LAYOUT */
+        .details-post-panel { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: #0c0e14; z-index:12; flex-direction:column; padding: 20px; overflow-y: auto; }
+        .publish-split-layout { display: flex; flex-direction: row; gap: 15px; width: 100%; margin-top: 20px; margin-bottom: 20px; }
+        .preview-left-side { flex: 0 0 110px; height: 140px; background: #050505; border-radius: 12px; overflow: hidden; display: flex; justify-content: center; align-items: center; border: 1px solid var(--border-color); }
+        .preview-left-side img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-right-side { flex: 1; display: flex; flex-direction: column; }
+        .preview-right-side textarea { height: 140px; resize: none; font-size: 14px; padding: 12px; }
+        
+        /* TEXT EDITOR MODAL */
+        .text-editor-overlay-modal { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.9); z-index: 20; flex-direction: column; justify-content: center; padding: 20px; align-items: center; }
+        .full-color-picker-box { display: flex; flex-direction: column; align-items: center; gap: 10px; margin: 25px 0; }
+        .modern-color-wheel { -webkit-appearance: none; appearance: none; width: 70px; height: 45px; background: transparent; border: none; cursor: pointer; }
+        .modern-color-wheel::-webkit-color-swatch { border-radius: 10px; border: 2px solid #fff; }
+
+        /* EMOJI PICKER MODAL (PÊKHATEYA گشتی) */
+        .instagram-emoji-modal { display: none; position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(20px); z-index: 20; flex-direction: column; justify-content: flex-end; }
+        .emoji-modal-content { background: rgba(25, 25, 25, 0.95); border-top-left-radius: 24px; border-top-right-radius: 24px; padding: 20px 15px; max-height: 60vh; overflow-y: auto; border-top: 1px solid var(--border-color); }
+        .emoji-grid-viewport { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; justify-content: center; padding-bottom: 30px; }
+        .emoji-item-clickable { font-size: 38px; text-align: center; cursor: pointer; transition: transform 0.1s; user-select: none; }
+        .emoji-item-clickable:active { transform: scale(1.2); }
+        
+        .sticker-rendered { position: absolute; font-size: 50px; cursor: move; z-index: 5; user-select: none; pointer-events: auto; }
+
+        /* INBOX DESIGN */
+        .inbox-wrapper { width: 100%; height: 100%; display: flex; flex-direction: column; background: #06070d; padding-top: 60px; }
+        .inbox-header-container { padding: 10px 15px; }
+        .inbox-header-container h2 { font-size: 24px; text-align: left; font-weight: 800; background: linear-gradient(45deg, #fff, var(--text-gray)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .inbox-top-nav-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 10px 15px; border-bottom: 1px solid var(--border-color); }
+        .inbox-square-btn { background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 5px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: #94a3b8; transition: all 0.2s; }
+        .inbox-square-btn:hover, .inbox-square-btn.active { background: rgba(0, 240, 255, 0.08); border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .inbox-square-btn span.icon { font-size: 20px; margin-bottom: 4px; }
+        .inbox-square-btn span.label { font-size: 11px; font-weight: 700; text-align: center; }
+        .inbox-results-area { flex: 1; padding: 15px; overflow-y: auto; }
+
+        /* SEARCH DESIGN */
+        .search-wrapper { width: 100%; height: 100%; display: flex; flex-direction: column; background: #06070d; justify-content: flex-start; }
+        .search-top-container { width: 100%; padding: 20px 15px 10px 15px; background: linear-gradient(to bottom, rgba(13, 16, 27, 0.5), transparent); }
+        .search-top-container h2 { font-size: 22px; text-align: left; margin-bottom: 12px; font-weight: 800; background: linear-gradient(45deg, #fff, var(--text-gray)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .search-input-field { width: 100%; padding: 14px 16px; background-color: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-white); font-size: 15px; outline: none; }
+        .search-input-field:focus { border-color: var(--accent-cyan); background-color: rgba(0,0,0,0.5); }
+        .search-type-tabs { display: none; grid-template-columns: 1fr 1fr; padding: 0 15px; margin-bottom: 15px; border-bottom: 1px solid var(--border-color); }
+        .search-tab-btn { padding: 12px 0; text-align: center; font-size: 14px; font-weight: 700; color: var(--text-gray); cursor: pointer; position: relative; }
+        .search-tab-btn.active { color: var(--accent-cyan); }
+        .search-tab-btn.active::after { content: ''; position: absolute; bottom: 0; left: 25%; width: 50%; height: 3px; background-color: var(--accent-cyan); border-radius: 3px; }
+        .search-results-content { flex: 1; padding: 10px 15px; overflow-y: auto; }
+        
+        .result-item { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+        .result-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(45deg, var(--accent-pink), var(--accent-cyan)); display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; color: white; }
+        .result-info { display: flex; flex-direction: column; gap: 2px; text-align: left; }
+        .result-title { font-size: 14px; font-weight: 700; color: #fff; }
+        .result-subtitle { font-size: 12px; color: var(--text-gray); }
+
+        /* NAV BAR STRUCTURE */
+        .tiktok-nav { height: 65px; background-color: #000000; border-top: 1px solid rgba(255,255,255,0.1); display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; justify-items: center; width: 100%; z-index: 5; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #777; cursor: pointer; font-size: 11px; font-weight: 600; width: 100%; height: 100%; transition: color 0.2s; }
+        .nav-item svg { width: 22px; height: 22px; fill: currentColor; margin-bottom: 3px; }
+        .nav-item.active { color: #ffffff; }
+        .nav-item-add { position: relative; }
+        .add-btn-design { width: 44px; height: 28px; background: #fff; border-radius: 8px; position: relative; display: flex; align-items: center; justify-content: center; color: #000 !important; font-size: 18px; font-weight: bold; }
+        .add-btn-design::before { content: ''; position: absolute; width: 44px; height: 28px; background: #00f0ff; border-radius: 8px; left: -3px; top: 0; z-index: -1; }
+        .add-btn-design::after { content: ''; position: absolute; width: 44px; height: 28px; background: #ff0055; border-radius: 8px; right: -3px; top: 0; z-index: -2; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- SPLASH SCREEN -->
+        <div id="splash-screen" class="screen active">
+            <div class="logo-box">
+                <svg class="logo-svg" viewBox="0 0 100 100">
+                    <polygon points="50,15 82,33 82,67 50,85 18,67 18,33" stroke="url(#cyberGradient)" stroke-width="4" fill="none" />
+                    <polygon points="42,35 68,50 42,65" fill="#ffffff" />
+                    <defs><linearGradient id="cyberGradient"><stop offset="0%" stop-color="#00f0ff" /><stop offset="100%" stop-color="#ff0055" /></linearGradient></defs>
+                </svg>
+            </div>
+            <h1 class="brand-name">TECH RELL</h1>
+        </div>
+
+        <!-- WELCOME SCREEN -->
+        <div id="welcome-screen" class="screen">
+            <div class="card-panel">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2>TECH RELL</h2>
+                    <p class="subtitle">تۆڕا ڤیدیۆیی یا تەکنەلۆژییا نوی</p>
+                </div>
+                <button class="btn" onclick="navigateTo('signin-screen')">SIGN IN</button>
+                <button class="btn btn-secondary" onclick="navigateTo('signup-screen')">SIGN UP</button>
+            </div>
+        </div>
+
+        <!-- SIGN IN SCREEN -->
+        <div id="signin-screen" class="screen">
+            <div class="card-panel">
+                <h2>SIGN IN</h2>
+                <p class="subtitle">بچۆ د ناڤ حسابا خۆ دا</p>
+                <form id="signin-form" onsubmit="handleSignIn(event)">
+                    <div class="form-group"><label>EMAIL</label><input type="email" id="login-email" required></div>
+                    <div class="form-group"><label>PASSWORD</label><input type="password" id="login-pass" required></div>
+                    <div class="forget-link" onclick="navigateTo('forget-password-screen')">پاسوۆرد ژبیر کر ل ڤێرە کلیک بکە؟</div>
+                    <button type="submit" class="btn">SIGN IN</button>
+                </form>
+                <button class="btn btn-secondary" onclick="navigateTo('welcome-screen')">← زڤڕین</button>
+            </div>
+        </div>
+
+        <!-- FORGET PASSWORD SCREEN -->
+        <div id="forget-password-screen" class="screen">
+            <div class="card-panel">
+                <h2>RESET PASSWORD</h2>
+                <p class="subtitle">ناڤێ خۆ بنڤیسە و کۆد دێ بۆ ئیمەیلی چیت</p>
+                <form id="forget-form" onsubmit="handleForgetPassword(event)">
+                    <div class="form-group"><label>USERNAME</label><input type="text" id="forget-user" required></div>
+                    <button type="submit" class="btn">SEND CODE</button>
+                </form>
+                <button class="btn btn-secondary" onclick="navigateTo('signin-screen')">← زڤڕین</button>
+            </div>
+        </div>
+
+        <!-- NEW PASSWORD SETTING SCREEN -->
+        <div id="new-password-screen" class="screen">
+            <div class="card-panel">
+                <h2>ENTER NEW PASSWORD</h2>
+                <p class="subtitle">کۆدێ هاتی و پاسوۆردێ نوو داخل بکە</p>
+                <form id="reset-final-form" onsubmit="handleFinalReset(event)">
+                    <div class="form-group"><label>VERIFICATION CODE</label><input type="text" id="reset-otp" required></div>
+                    <div class="form-group"><label>NEW PASSWORD</label><input type="password" id="new-pass" required></div>
+                    <button type="submit" class="btn">تمام</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- SIGN UP SCREEN -->
+        <div id="signup-screen" class="screen">
+            <div class="card-panel">
+                <h2>SIGN UP</h2>
+                <p class="subtitle">حسابەکا نوو تۆمار بکە</p>
+                <form id="signup-form" onsubmit="handleSignUp(event)">
+                    <div class="form-group"><label>USERNAME</label><input type="text" id="reg-user" required></div>
+                    <div class="form-group"><label>NAME</label><input type="text" id="reg-name" required></div>
+                    <div class="form-group"><label>EMAIL</label><input type="email" id="reg-email" required></div>
+                    <div class="form-group"><label>PASSWORD</label><input type="password" id="reg-pass" required></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>COUNTRY</label><select id="reg-country"><option value="Iraq">Iraq</option></select></div>
+                        <div class="form-group"><label>GENDER</label><select id="reg-gender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+                    </div>
+                    <button type="submit" class="btn">SUBMIT & SEND CODE</button>
+                </form>
+                <button class="btn btn-secondary" onclick="navigateTo('welcome-screen')">← زڤڕین</button>
+            </div>
+        </div>
+
+        <!-- EMAIL VERIFICATION SCREEN -->
+        <div id="signup-verify-screen" class="screen">
+            <div class="card-panel">
+                <h2>EMAIL VERIFICATION</h2>
+                <p class="subtitle">کۆدەک بۆ ئیمەیلێ تە چوویە</p>
+                <div class="form-group"><input type="text" id="email-otp" placeholder="••••••" maxlength="6" style="text-align:center; font-size:24px;" required></div>
+                <button class="btn" onclick="verifyAndSave()">VERIFY & SAVE</button>
+            </div>
+        </div>
+
+        <!-- MAIN APP SCREEN -->
+        <div id="main-app-screen" class="screen">
+            
+            <!-- TOP APP BAR -->
+            <div class="top-app-header" id="global-header-bar">
+                <div class="top-search-trigger" onclick="triggerTopSearchClick()">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </div>
+            </div>
+
+            <div class="app-content-area">
+                
+                <!-- HOME TAB -->
+                <div id="tab-home" class="tab-content active">
+                    <div style="text-align:center;">
+                        <div style="font-size:45px; margin-bottom:10px;">🏠</div>
+                        <p style="font-size:18px; font-weight: bold;">بەشێ سەرەکی (HOME)</p>
+                        <p style="color: var(--text-gray); font-size: 14px; margin-top: 5px;">پۆست و بابەتێن نوو ل ڤێرە بنڤیسە...</p>
+                    </div>
+                </div>
+
+                <!-- REELS TAB -->
+                <div id="tab-reels" class="tab-content">
+                    <div style="text-align:center;">
+                        <div style="font-size:45px; margin-bottom:10px;">🎬</div>
+                        <p style="font-size:18px; font-weight: bold;">بەشێ ڕیڵز (TECH REELS)</p>
+                        <p style="color: var(--text-gray); font-size: 14px; margin-top: 5px;">ڤیدیۆ ل ڤێرە دێ دیار بن...</p>
+                    </div>
+                </div>
+
+                <!-- HIDDEN SEARCH TAB WORKFLOW -->
+                <div id="tab-search" class="tab-content" style="padding:0; align-items:stretch;">
+                    <div class="search-wrapper">
+                        <div class="search-top-container" style="display:flex; flex-direction:column; gap:10px;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <h2>SEARCH</h2>
+                                <button onclick="exitSearchMode()" style="background:transparent; border:none; color:var(--accent-pink); font-weight:bold; cursor:pointer;">داخستن ❌</button>
+                            </div>
+                            <input type="text" id="main-search-input" class="search-input-field" placeholder="بگەڕێ پاشان کلیک ل سەر Enter بکە..." onkeydown="handleSearchKeyPress(event)">
+                        </div>
+                        
+                        <div class="search-type-tabs" id="search-filter-tabs">
+                            <div class="search-tab-btn active" id="search-tab-users" onclick="switchSearchFilter('users')">Users (بکارهێنەر)</div>
+                            <div class="search-tab-btn" id="search-tab-posts" onclick="switchSearchFilter('posts')">Posts (پۆست)</div>
+                        </div>
+
+                        <div class="search-results-content" id="search-results-box">
+                            <p style="color: var(--text-gray); font-size: 13px; text-align: center; margin-top: 40px;">چ تشت نەهاتیە گەڕیان. تشتەکێ بنڤیسە...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CAMERA TAB (+) -->
+                <div id="tab-add" class="tab-content" style="padding:0;">
+                    <div class="camera-container">
+                        <video id="camera-stream" autoplay playsinline></video>
+                        <div id="screen-flash-overlay"></div>
+                        
+                        <!-- LIVE CAMERA STICKERS LAYER -->
+                        <div id="live-sticker-zone"></div>
+
+                        <!-- PREVIEW BOX -->
+                        <div id="gallery-preview-box" class="preview-box">
+                            <div class="preview-top-bar">
+                                <button class="cam-icon-btn" onclick="closePreview()">❌</button>
+                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                    <button class="cam-icon-btn" onclick="openTextEditorModal()" style="font-weight:bold; font-size:22px; color:var(--accent-cyan);">T</button>
+                                    <button class="cam-icon-btn" onclick="openEmojiPickerModal('preview')" style="font-size:22px;">😀</button>
+                                </div>
+                            </div>
+
+                            <div class="fullscreen-media-container" id="media-container-zone">
+                                <img id="preview-media" src="" alt="Preview">
+                                <div id="media-text-overlay" class="media-overlay-text-display" onclick="openTextEditorModal()" style="display:none; left: 30%; top: 40%;"></div>
+                                <div id="sticker-container-zone" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:6;"></div>
+                            </div>
+
+                            <!-- TEXT EDITOR MODAL -->
+                            <div id="text-editor-modal" class="text-editor-overlay-modal">
+                                <input type="text" id="media-custom-text-input" placeholder="لێرە دەقێ خۆ بنڤیسە...">
+                                <div class="full-color-picker-box">
+                                    <input type="color" id="html-color-wheel" class="modern-color-wheel" value="#ffffff">
+                                </div>
+                                <button class="btn" onclick="saveTextOverlay()">Save Text</button>
+                                <button class="btn btn-secondary" onclick="closeTextEditorModal()">Cancel</button>
+                            </div>
+
+                            <div class="preview-bottom-bar">
+                                <button class="story-quick-btn" onclick="quickPublishStory()">⏱️ Story</button>
+                                <button class="next-step-btn" onclick="openStepTwoDetails()">Next ➡️</button>
+                            </div>
+                        </div>
+
+                        <!-- EMOJI PICKER MODAL (بۆ هەردوو بەشان کار دکەت) -->
+                        <div id="emoji-picker-modal" class="instagram-emoji-modal" onclick="closeEmojiPickerModal()">
+                            <div class="emoji-modal-content" onclick="event.stopPropagation()">
+                                <div class="emoji-grid-viewport" id="emoji-grid-container"></div>
+                            </div>
+                        </div>
+
+                        <!-- DETAILS POST PANEL -->
+                        <div id="details-post-panel" class="details-post-panel">
+                            <button class="cam-icon-btn" onclick="backToStepOne()">←</button>
+                            <div class="publish-split-layout">
+                                <div class="preview-left-side" id="split-media-zone"></div>
+                                <div class="preview-right-side">
+                                    <textarea id="post-caption-input" placeholder="تێکست یان تایتل بنڤیسە..."></textarea>
+                                </div>
+                            </div>
+                            <button class="btn" onclick="finalPublishPost()">Post 📝</button>
+                        </div>
+
+                        <!-- CAMERA OVERLAY -->
+                        <div class="camera-overlay">
+                            <div class="add-music-center-container"><button class="add-music-btn">🎵 زیادکردنی میوزیک</button></div>
+                            <div class="camera-top-actions">
+                                <button class="cam-icon-btn" onclick="exitCameraTab()">❌</button>
+                                
+                                <!-- لێرە ئایکۆنی ئیمۆجی کەوتە نێوان ئایکۆنی گۆڕین و فڵاش -->
+                                <div class="camera-top-right-group">
+                                    <button class="cam-icon-btn" onclick="flipCamera()">🔄</button>
+                                    <button class="cam-icon-btn" onclick="openEmojiPickerModal('camera')" style="font-size:22px;">😀</button>
+                                    <button class="cam-icon-btn" id="flash-toggle-btn" onclick="toggleFlash()">⚡</button>
+                                </div>
+                                
+                            </div>
+                            <div class="camera-bottom-actions">
+                                <button class="capture-trigger-btn" id="capture-btn" onclick="triggerCapture()"></button>
+                                <div class="camera-modes">
+                                    <div class="camera-mode-item active" onclick="setCamMode('photo', this)">PHOTO</div>
+                                    <div class="camera-mode-item" onclick="setCamMode('video', this)">VIDEO</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- INBOX TAB -->
+                <div id="tab-inbox" class="tab-content" style="padding:0; align-items:stretch;">
+                    <div class="inbox-wrapper">
+                        <div class="inbox-header-container">
+                            <h2 id="inbox-title-display">INBOX</h2>
+                        </div>
+                        <div class="inbox-top-nav-grid">
+                            <div class="inbox-square-btn active" id="box-btn-followers" onclick="highlightInboxIcon('followers')"><span class="icon">👥</span><span class="label">دەوروبەر</span></div>
+                            <div class="inbox-square-btn" id="box-btn-comments" onclick="highlightInboxIcon('comments')"><span class="icon">💬</span><span class="label">ئاگەهداری</span></div>
+                            <div class="inbox-square-btn" id="box-btn-messages" onclick="highlightInboxIcon('messages')"><span class="icon">✉️</span><span class="label">نامەکان</span></div>
+                        </div>
+                        <div class="inbox-results-area" id="inbox-content-box">
+                            <p style="color: var(--text-gray); font-size: 13px; text-align: center; margin-top: 30px;">لیستا تە دێ ل ڤێرە دیار بیت...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROFILE TAB -->
+                <div id="tab-profile" class="tab-content">
+                    <div style="text-align:center;">
+                        <p id="profile-name-display" style="font-size: 20px; font-weight: bold;">پرۆفایلێ : بەکارهێنەر</p>
+                        <button class="btn btn-secondary" onclick="location.reload()" style="width:140px; margin-top:20px;">Logout</button>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- NAVIGATION BAR STRUCTURE -->
+            <div class="tiktok-nav" id="main-bottom-nav">
+                <div id="nav-btn-home" class="nav-item active" onclick="changeTab('home', this)">
+                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg><span>Home</span>
+                </div>
+                <div id="nav-btn-reels" class="nav-item" onclick="changeTab('reels', this)">
+                    <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z"/></svg><span>Reels</span>
+                </div>
+                <div id="nav-btn-add" class="nav-item nav-item-add" onclick="changeTab('add', this)">
+                    <div class="add-btn-design">+</div>
+                </div>
+                <div id="nav-btn-inbox" class="nav-item" onclick="changeTab('inbox', this)">
+                    <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg><span>Inbox</span>
+                </div>
+                <div id="nav-btn-profile" class="nav-item" onclick="changeTab('profile', this)">
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg><span>Profile</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let cameraStreamObj = null, currentFacingMode = "user", currentCamMode = "photo";
+        let isFlashActive = false;
+        let currentActiveTab = 'home'; 
+        let previousActiveTab = 'home'; 
+        let currentSearchQuery = "";
+        let currentSearchFilter = "users";
+        let currentInboxCategory = "followers"; 
+        let emojiTargetContext = "camera"; // پشکنینی شوێنی کلیک (کامێرا یان پرێڤیو)
+        let defaultSampleImage = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800";
+
+        const databaseMock = {
+            users: [
+                { name: "tech_official", info: "کارمەندێ تەکنەلۆژیایێ - 14.5K Followers" },
+                { name: "rell_master", info: "بەرنامەساز - 5.2K Followers" },
+                { name: "alan_tech", info: "مۆبایل و تەکنەلۆژیا - 9.1K Followers" }
+            ],
+            posts: [
+                { title: "نووترین مۆبایلێن کۆمپانیا Apple ل سالا 2026", info: "شیکاری - 890 Likes" },
+                { title: "چەوانیا دروستکرنا ئەپڵیکەیشنان بێ کۆد", info: "فێرکاری - 1.2K Likes" }
+            ],
+            inboxData: {
+                followers: [
+                    { name: "karwan_jamil", info: "دەستی بڵاوکردنەوەی فۆڵۆت کرد" },
+                    { name: "helin_duhok", info: "تۆڕی خۆی زیاد کردیت" }
+                ],
+                comments: [
+                    { name: "tech_official", info: "کۆمێنتی نووسیوە: ئەمە نایابە! 🚀" }
+                ],
+                messages: [
+                    { name: "rell_master", info: "نامەیەکی نوێ: سڵاو، پڕۆژەکە تەواو بوو؟" }
+                ]
+            }
+        };
+
+        // لێرە پۆلێنکردنی تەمام ب سەدان ئیمۆجیێن جۆراوجۆر هەیە
+        const megaEmojiList = [
+            // Faces & Smileys
+            "😀","😃","😄","😁","😆","😅","😂","🤣","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😝","😜","🤪","🤨","🧐","🤓","😎","🤩","🥳","😏","😒","😞","😔","😟","😕","🙁","☹️","😣","😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤬","🤯","😳","🥵","🥶","😱","😨","😰","😥","😓","🤗","🤔","🤭","🤫","🤥","😶","😐","😑","😬","🙄","😯","😦","😧","😮","😲","🥱","😴","🤤","😪","😵","🤐","🥴","🤢","🤮","🤧","😷","🤒","🤕",
+            // Hearts & Hands
+            "❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💟","👋","🤚","🖐️","✋","🖖","👌","🤏","✌️","🤞","🤟","🤘","🤙","👈","👉","👆","🖕","👇","☝️","👍","👎","✊","👊","🤛","🤜","👏","🙌","👐","🤲","🤝","🙏","✍️","💅","🤳","💪",
+            // Tech & Objects
+            "🔥","🚀","💻","📱","⌚","🖥️","🖨️","🖱️","🖲️","🕹️","🗜️","💽","💾","💿","📀","📼","📷","📸","📹","🎥","📽️","🎞️","📞","📟","📠","📺","📻","🎙️","🎚️","🎛️","🧭","⏱️","⏲️","⏰","🧯","🛢️","💸","💵","💴","💶","💷","🪙","💰","💳","💎",
+            // Transport & Places
+            "🚗","🚕","🚙","🚌","🚎","🏎️","🚓","🚑","🚒","🚐","🛻","🚚","🚛","🚜","🛵","🏍️","🛺","🚲","🛴","🛹","🛞","🚨","🛹","✈️","🛫","🛬","🚁","🛸","🛰️","🗺️","🗻","🌋","🏕️","🏖️","🏜️","🏝️","🏟️",
+            // Flags & Symbols
+            "⚠️","🛑","✨","💯","🎉","👑","🎬","🏆","🏅","🥇","🥈","🥉","⚽","🏀","🏈","⚾","🎾","🏐","🏉","🎱","🏓","🏸","🥅","🥊","🥋","🥇","🎯","🪀","🪁","🔮","🧿","🧩","🧸","🪄"
+        ];
+
+        setTimeout(() => { 
+            const splash = document.getElementById('splash-screen');
+            splash.style.opacity = '0';
+            setTimeout(() => { splash.style.display = 'none'; navigateTo('welcome-screen'); }, 150);
+        }, 1500);
+
+        function navigateTo(id) { 
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
+            document.getElementById(id).classList.add('active');
+        }
+
+        function enterMainAppAndShowHome() {
+            navigateTo('main-app-screen');
+            changeTab('home', document.getElementById('nav-btn-home'));
+        }
+
+        function changeTab(tabName, element) {
+            if (tabName !== 'add' && tabName !== 'search') { previousActiveTab = tabName; }
+            currentActiveTab = tabName;
+            
+            document.querySelectorAll('.tiktok-nav .nav-item').forEach(i => i.classList.remove('active'));
+            if(element) { element.classList.add('active'); } 
+            else {
+                let targetBtn = document.getElementById(`nav-btn-${tabName}`);
+                if(targetBtn) targetBtn.classList.add('active');
+            }
+
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            const globalHeader = document.getElementById('global-header-bar');
+            if (tabName === 'home' || tabName === 'reels' || tabName === 'inbox') {
+                globalHeader.style.display = 'flex';
+            } else {
+                globalHeader.style.display = 'none';
+            }
+
+            const bottomNav = document.getElementById('main-bottom-nav');
+            if(tabName === 'add' || tabName === 'search') { 
+                bottomNav.style.display = 'none';
+                if(tabName === 'add') { startCamera(); } else { stopCamera(); }
+            } else { 
+                bottomNav.style.display = 'grid';
+                stopCamera(); 
+            }
+
+            if(tabName === 'inbox') { highlightInboxIcon(currentInboxCategory); }
+        }
+
+        function triggerTopSearchClick() { changeTab('search', null); }
+        function exitSearchMode() { changeTab(previousActiveTab, document.getElementById(`nav-btn-${previousActiveTab}`)); }
+
+        function handleSearchKeyPress(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                let query = document.getElementById('main-search-input').value.trim().toLowerCase();
+                if (query === "") return;
+                currentSearchQuery = query;
+                document.getElementById('search-filter-tabs').style.display = 'grid';
+                renderSearchResults();
+            }
+        }
+
+        function switchSearchFilter(filterType) {
+            currentSearchFilter = filterType;
+            document.querySelectorAll('.search-tab-btn').forEach(b => b.classList.remove('active'));
+            if(filterType === 'users') document.getElementById('search-tab-users').classList.add('active');
+            else document.getElementById('search-tab-posts').classList.add('active');
+            renderSearchResults();
+        }
+
+        function renderSearchResults() {
+            const MathBox = document.getElementById('search-results-box');
+            MathBox.innerHTML = ""; 
+            if (currentSearchFilter === 'users') {
+                let filtered = databaseMock.users.filter(u => u.name.includes(currentSearchQuery));
+                if(filtered.length === 0) { MathBox.innerHTML = `<p style="text-align:center;margin-top:40px;color:var(--text-gray)">نەدۆزرایەوە</p>`; return; }
+                filtered.forEach(user => {
+                    MathBox.innerHTML += `<div class="result-item"><div class="result-avatar">👤</div><div class="result-info"><div class="result-title">${user.name}</div><div class="result-subtitle">${user.info}</div></div></div>`;
+                });
+            } else {
+                let filtered = databaseMock.posts.filter(p => p.title.toLowerCase().includes(currentSearchQuery));
+                if(filtered.length === 0) { MathBox.innerHTML = `<p style="text-align:center;margin-top:40px;color:var(--text-gray)">نەدۆزرایەوە</p>`; return; }
+                filtered.forEach(post => {
+                    MathBox.innerHTML += `<div class="result-item"><div class="result-avatar">📦</div><div class="result-info"><div class="result-title">${post.title}</div><div class="result-subtitle">${post.info}</div></div></div>`;
+                });
+            }
+        }
+
+        function highlightInboxIcon(targetSubId) {
+            currentInboxCategory = targetSubId;
+            document.querySelectorAll('.inbox-square-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`box-btn-${targetSubId}`).classList.add('active');
+            
+            const contentBox = document.getElementById('inbox-content-box');
+            contentBox.innerHTML = "";
+            
+            let data = databaseMock.inboxData[targetSubId];
+            if(data && data.length > 0) {
+                data.forEach(item => {
+                    contentBox.innerHTML += `<div class="result-item"><div class="result-avatar">🔔</div><div class="result-info"><div class="result-title">${item.name}</div><div class="result-subtitle">${item.info}</div></div></div>`;
+                });
+            } else {
+                contentBox.innerHTML = `<p style="color: var(--text-gray); font-size: 13px; text-align: center; margin-top: 30px;">لیستی ${targetSubId} لێرە بەتاڵە.</p>`;
+            }
+        }
+
+        function exitCameraTab() { changeTab(previousActiveTab, document.getElementById(`nav-btn-${previousActiveTab}`)); }
+        
+        function startCamera() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: currentFacingMode }, audio: false })
+                .then(stream => { 
+                    cameraStreamObj = stream; 
+                    document.getElementById('camera-stream').srcObject = stream; 
+                }).catch(err => {
+                    console.warn("Camera fallback applied.");
+                });
+            }
+        }
+        
+        function stopCamera() { if (cameraStreamObj) { cameraStreamObj.getTracks().forEach(t => t.stop()); } }
+        function flipCamera() { currentFacingMode = (currentFacingMode === "user") ? "environment" : "user"; startCamera(); }
+        
+        function toggleFlash() { 
+            isFlashActive = !isFlashActive; 
+            document.getElementById('flash-toggle-btn').style.color = isFlashActive ? '#ffea00' : '#fff';
+            document.getElementById('flash-toggle-btn').style.filter = isFlashActive ? "drop-shadow(0 0 8px #ffea00)" : "none";
+        }
+        
+        function setCamMode(mode, el) { 
+            document.querySelectorAll('.camera-mode-item').forEach(m => m.classList.remove('active')); 
+            el.classList.add('active'); 
+            currentCamMode = mode; 
+            let captureBtn = document.getElementById('capture-btn');
+            if (mode === 'video') captureBtn.classList.add('video-mode');
+            else captureBtn.classList.remove('video-mode');
+        }
+
+        function triggerCapture() { 
+            if(isFlashActive) {
+                let flash = document.getElementById('screen-flash-overlay');
+                flash.style.display = 'block';
+                setTimeout(() => { flash.style.display = 'none'; }, 100);
+            }
+            openFullscreenPreview(defaultSampleImage); 
+        }
+        
+        function openFullscreenPreview(src) { 
+            document.getElementById('gallery-preview-box').style.display = 'flex'; 
+            document.getElementById('preview-media').src = src; 
+            document.getElementById('sticker-container-zone').innerHTML = "";
+            let textOverlay = document.getElementById('media-text-overlay');
+            textOverlay.style.display = "none";
+            textOverlay.innerText = "";
+        }
+        
+        function closePreview() { 
+            document.getElementById('gallery-preview-box').style.display = 'none'; 
+            exitCameraTab(); 
+        }
+
+        function openTextEditorModal() { document.getElementById('text-editor-modal').style.display = 'flex'; }
+        function closeTextEditorModal() { document.getElementById('text-editor-modal').style.display = 'none'; }
+        
+        function saveTextOverlay() {
+            let customText = document.getElementById('media-custom-text-input').value.trim();
+            let chosenColor = document.getElementById('html-color-wheel').value;
+            let targetOverlay = document.getElementById('media-text-overlay');
+            
+            if(customText !== "") {
+                targetOverlay.innerText = customText;
+                targetOverlay.style.color = chosenColor;
+                targetOverlay.style.display = 'block';
+                makeElementDraggable(targetOverlay);
+            }
+            closeTextEditorModal();
+        }
+
+        // پەرەپێدانا سیستەمێ ئیمۆجیان بۆ تێکهەڵکردنی سەدان جۆر
+        function openEmojiPickerModal(contextMode) {
+            emojiTargetContext = contextMode; 
+            let container = document.getElementById('emoji-grid-container');
+            container.innerHTML = "";
+            
+            // خستنی سەدان ئیمۆجی بۆ ناو لیستەکە
+            megaEmojiList.forEach(emoji => {
+                container.innerHTML += `<div class="emoji-item-clickable" onclick="dropEmoji('${emoji}')">${emoji}</div>`;
+            });
+            document.getElementById('emoji-picker-modal').style.display = 'flex';
+        }
+        
+        function closeEmojiPickerModal() { document.getElementById('emoji-picker-modal').style.display = 'none'; }
+        
+        function dropEmoji(emojiStr) {
+            let targetZoneId = (emojiTargetContext === 'camera') ? 'live-sticker-zone' : 'sticker-container-zone';
+            let zone = document.getElementById(targetZoneId);
+            
+            let newSticker = document.createElement('div');
+            newSticker.className = "sticker-rendered";
+            newSticker.innerText = emojiStr;
+            newSticker.style.left = "45%";
+            newSticker.style.top = "40%";
+            
+            zone.appendChild(newSticker);
+            makeElementDraggable(newSticker);
+            closeEmojiPickerModal();
+        }
+
+        function makeElementDraggable(elm) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            elm.onmousedown = dragMouseDown;
+            elm.ontouchstart = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                if(e.type !== 'touchstart') { e.preventDefault(); }
+                pos3 = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+                pos4 = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+                document.onmouseup = closeDragElement;
+                document.ontouchend = closeDragElement;
+                document.onmousemove = elementDrag;
+                document.ontouchmove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                let clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+                let clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+                pos1 = pos3 - clientX;
+                pos2 = pos4 - clientY;
+                pos3 = clientX;
+                pos4 = clientY;
+                elm.style.top = (elm.offsetTop - pos2) + "px";
+                elm.style.left = (elm.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+                document.ontouchend = null;
+                document.ontouchmove = null;
+            }
+        }
+
+        function openStepTwoDetails() {
+            document.getElementById('details-post-panel').style.display = 'flex';
+            document.getElementById('split-media-zone').innerHTML = `<img src="${document.getElementById('preview-media').src}">`;
+        }
+        function backToStepOne() { document.getElementById('details-post-panel').style.display = 'none'; }
+        
+        function quickPublishStory() {
+            alert("بۆ چیرۆکەکەت بڵاوکرایەوە!");
+            document.getElementById('gallery-preview-box').style.display = 'none';
+            document.getElementById('live-sticker-zone').innerHTML = "";
+            exitCameraTab();
+        }
+
+        function finalPublishPost() {
+            alert("پۆستەکەت بە سەرکەوتوویی بڵاوکرایەوە!");
+            document.getElementById('details-post-panel').style.display = 'none';
+            document.getElementById('gallery-preview-box').style.display = 'none';
+            document.getElementById('live-sticker-zone').innerHTML = "";
+            exitCameraTab();
+        }
+
+        function handleSignIn(e) { e.preventDefault(); enterMainAppAndShowHome(); }
+        function handleSignUp(e) { e.preventDefault(); navigateTo('signup-verify-screen'); }
+        function verifyAndSave() { enterMainAppAndShowHome(); }
+        function handleForgetPassword(e) { e.preventDefault(); navigateTo('new-password-screen'); }
+        function handleFinalReset(e) { e.preventDefault(); alert("پاسوۆرد بە سەرکەوتوویی گۆڕدرا"); navigateTo('signin-screen'); }
+    </script>
+</body>
+</html>
